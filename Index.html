@@ -1,0 +1,306 @@
+
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MuuttoMappi – Muuton muistilista</title>
+<style>
+:root {
+  --bg:#100d15;
+  --panel:#1c1723;
+  --purple:#b58ad8;
+  --text:#f5f0fa;
+  --muted:#b9adbf;
+  --line:#3a2d45;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:16px/1.5 system-ui,sans-serif;
+}
+main {
+  max-width:700px;
+  margin:auto;
+  padding:30px 18px 50px;
+}
+.brand {
+  color:var(--purple);
+  font-size:13px;
+  font-weight:bold;
+  letter-spacing:3px;
+}
+h1 {
+  font-size:38px;
+  line-height:1.1;
+  margin:15px 0;
+}
+.lead,.hint {color:var(--muted)}
+.panel {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:20px;
+  margin:20px 0;
+}
+input[type=date] {
+  display:block;
+  width:100%;
+  padding:13px;
+  margin-top:10px;
+  background:#241d2d;
+  color:white;
+  border:1px solid var(--line);
+  border-radius:10px;
+  font:inherit;
+}
+.progress {
+  height:8px;
+  background:#392e42;
+  border-radius:20px;
+  overflow:hidden;
+}
+#fill {
+  height:100%;
+  width:0;
+  background:var(--purple);
+}
+.progressline {
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+h2 {
+  color:var(--purple);
+  font-size:19px;
+}
+.task {
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:14px;
+  margin:8px 0;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:11px;
+}
+.task input {
+  width:19px;
+  height:19px;
+  accent-color:var(--purple);
+}
+.task.done span {
+  text-decoration:line-through;
+  color:var(--muted);
+}
+.links a {
+  display:block;
+  padding:13px;
+  margin:9px 0;
+  color:white;
+  background:#241d2d;
+  border:1px solid var(--line);
+  border-radius:10px;
+  text-decoration:none;
+}
+button {
+  padding:10px 15px;
+  color:white;
+  background:#241d2d;
+  border:1px solid var(--line);
+  border-radius:9px;
+}
+footer {
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:35px;
+}
+</style>
+</head>
+<body>
+<main>
+
+<div class="brand">MUUTTOMAPPI</div>
+
+<h1>Muutto mielessä?<br>Muista nämä.</h1>
+
+<p class="lead">
+Yksinkertainen muistilista, joka auttaa sinua
+muistamaan tärkeät asiat ennen muuttoa,
+muuttopäivänä ja sen jälkeen.
+</p>
+
+<section class="panel">
+<label for="date"><strong>Milloin muutat?</strong></label>
+<input type="date" id="date">
+<p class="hint">Valitse muuttopäivä ja saat oman aikataulusi.</p>
+</section>
+
+<section class="panel">
+<div class="progressline">
+<span>Muuttosi edistyminen</span>
+<strong id="count">0 / 0</strong>
+</div>
+<div class="progress">
+<div id="fill"></div>
+</div>
+</section>
+
+<div id="tasks"></div>
+
+<section>
+<h2>Hyödylliset palvelut</h2>
+<div class="links">
+<a href="https://www.posti.fi/henkiloille/muuttoilmoitus" target="_blank">Posti – muuttoilmoitus ↗</a>
+<a href="https://dvv.fi/muutto" target="_blank">Digi- ja väestötietovirasto ↗</a>
+<a href="https://www.suomi.fi/" target="_blank">Suomi.fi ↗</a>
+</div>
+</section>
+
+<button onclick="resetTasks()">Nollaa rastit</button>
+
+<footer>MuuttoMappi · Maksuton muuttajan muistilista</footer>
+
+</main>
+
+<script>
+const groups = [
+{
+title:"Noin kuukausi ennen",
+days:30,
+items:[
+"Tee muuttoilmoitus Postiin ja DVV:lle",
+"Irtisano vanhan kodin sopimukset tai sovi niiden siirrosta",
+"Tee sähkösopimus uuteen kotiin",
+"Varaa muuttoauto tai muuttoapu",
+"Aloita turhien tavaroiden karsiminen"
+]
+},
+{
+title:"Noin kaksi viikkoa ennen",
+days:14,
+items:[
+"Hanki muuttolaatikot ja pakkaustarvikkeet",
+"Ilmoita uusi osoite tärkeille tahoille",
+"Selvitä avainten luovutus ja muuttopäivän käytännöt",
+"Aloita harvemmin tarvittavien tavaroiden pakkaaminen"
+]
+},
+{
+title:"Viimeinen viikko",
+days:7,
+items:[
+"Pakkaa tavarat ja merkitse laatikot",
+"Varmista muuttoapu ja kuljetus",
+"Suojaa helposti särkyvät tavarat",
+"Varaa ensimmäisen yön tärkeimmät tavarat erikseen",
+"Tyhjennä pakastin ja siivoa kaapit"
+]
+},
+{
+title:"Muuttopäivä",
+days:0,
+items:[
+"Tarkista vanhan asunnon kaapit ja varastot",
+"Ota tarvittaessa kuvat asunnon kunnosta",
+"Palauta vanhan asunnon avaimet sovitusti",
+"Tarkista uuden kodin kunto"
+]
+},
+{
+title:"Muuton jälkeen",
+days:-2,
+items:[
+"Tarkista sähkön ja muiden palveluiden toiminta",
+"Päivitä osoite tarvittaville tahoille",
+"Tarkista kotivakuutuksen osoite",
+"Tutustu uuden kodin jätehuoltoon"
+]
+}
+];
+
+const dateInput=document.getElementById("date");
+const tasks=document.getElementById("tasks");
+
+let date=new Date();
+date.setDate(date.getDate()+30);
+dateInput.value=date.toISOString().slice(0,10);
+
+let checked=JSON.parse(
+localStorage.getItem("muuttomappi") || "{}"
+);
+
+function render() {
+tasks.innerHTML="";
+const moveDate=new Date(dateInput.value+"T12:00:00");
+
+groups.forEach((group,g)=>{
+const section=document.createElement("section");
+section.innerHTML="<h2>"+group.title+"</h2>";
+
+const d=new Date(moveDate);
+d.setDate(d.getDate()-group.days);
+
+const heading=section.querySelector("h2");
+heading.textContent+=" · "+d.toLocaleDateString("fi-FI");
+
+group.items.forEach((item,i)=>{
+const key=g+"-"+i;
+const label=document.createElement("label");
+label.className="task"+(checked[key]?" done":"");
+
+const box=document.createElement("input");
+box.type="checkbox";
+box.checked=!!checked[key];
+
+box.onchange=()=>{
+checked[key]=box.checked;
+localStorage.setItem("muuttomappi",JSON.stringify(checked));
+render();
+};
+
+const span=document.createElement("span");
+span.textContent=item;
+
+label.append(box,span);
+section.append(label);
+});
+
+tasks.append(section);
+});
+
+updateProgress();
+}
+
+function updateProgress() {
+let total=0,done=0;
+
+groups.forEach((group,g)=>{
+group.items.forEach((item,i)=>{
+total++;
+if(checked[g+"-"+i]) done++;
+});
+});
+
+document.getElementById("count").textContent=
+done+" / "+total+" tehtävää";
+
+document.getElementById("fill").style.width=
+(done/total*100)+"%";
+}
+
+function resetTasks() {
+checked={};
+localStorage.removeItem("muuttomappi");
+render();
+}
+
+dateInput.addEventListener("change",render);
+render();
+</script>
+</body>
+</html>
